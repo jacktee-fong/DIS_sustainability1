@@ -32,3 +32,20 @@ def calculate_working_days(dataframe):
         dataframe.at[index, 'working_day'] = working_days
     return dataframe
 
+def calculate_carbon(row, variable, intensity):
+    """
+    Calculate the carbon emissions for a given row of data based on 'energy' and 'water'.
+    Args:
+    row: An object represents a row of dataframe that includes key like month, energy and water. 
+    variable: A string as the type of variable to calculate emissions for 'energy' or 'water'.
+    intensity: A dictionary with the value'grid_emission_factor' for energy and 'water_factor' for water.
+    Returns: A float that calculated carbon emissions based on the input row, variable and intensity.
+    """
+    year = row["month"].year
+    if variable == "energy":
+        factor_index = intensity[year]['grid_emission_factor']
+        return row["energy"] * factor_index
+    else:
+        factor_index = intensity[year]['water_factor']
+        return row["water"] * factor_index
+

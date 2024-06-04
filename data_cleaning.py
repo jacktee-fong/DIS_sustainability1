@@ -50,6 +50,9 @@ for codes, details in data_basic.items():
     # use the function 'calculate_working_days' which import from utility 
     df_building = calculate_working_days(df_building)
 
+    # create a codes column to store the sheetname
+    df_building['codes'] = data_building['tab']
+
     # store df_building to dataframe_building with the respective sheetname
     dataframe_building[data_building['tab']] = df_building
 
