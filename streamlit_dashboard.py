@@ -1,18 +1,33 @@
 import streamlit as st
-from streamlit_utils.utils import st_get_all_building, st_get_basic_data
+from streamlit_utils.utils import st_get_all_building, st_get_basic_data, kpi_card
+from streamlit_utils.code_dict import code_dict
+from streamlit_theme import st_theme
 import os
 
+
+# set up the basic config and parameter
 IMAGE_PATH = "store/photo"
 
 st.set_page_config(page_title="DIS Sustainability", page_icon=':star', layout='wide')
 
-# Using "with" notation
+
+theme_base = st_theme()
+if theme_base["base"] == "dark":
+    theme_dark = True
+else:
+    theme_dark = False
+
+# Sidebar show the basic information on the building selected by user
 with st.sidebar:
+    # let user select the building for the dashboard
     code_selected = st.selectbox(
         "",
         st_get_all_building()
     )
-    basic_data = st_get_basic_data("SGX1")
+    code = code_dict[code_selected]
+
+    # populate the basic data information in the sidebar
+    basic_data = st_get_basic_data(code)
     st.write(basic_data.address)
     image_path = os.path.join(IMAGE_PATH, basic_data.photo)
     st.image(image_path)
@@ -30,68 +45,10 @@ with st.sidebar:
         st.markdown(f'<div style="text-align: right;">{basic_data.net_area}</div>', unsafe_allow_html=True)
         st.markdown(f'<div style="text-align: right;">{basic_data.net_area}</div>', unsafe_allow_html=True)
 
-    wch_colour_box = (0, 204, 102)
-    wch_colour_font = (0, 0, 0)
-    fontsize = 18
-    valign = "left"
-    iconname = "fas fa-asterisk"
-    sline = "Observations"
-    lnk = '<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.1/css/all.css" crossorigin="anonymous">'
-    i = 123
-
-    htmlstr = f"""<p style='background-color: rgb({wch_colour_box[0]}, 
-                                                      {wch_colour_box[1]}, 
-                                                      {wch_colour_box[2]}, 0.75); 
-                                color: rgb({wch_colour_font[0]}, 
-                                           {wch_colour_font[1]}, 
-                                           {wch_colour_font[2]}, 0.75); 
-                                font-size: {fontsize}px; 
-                                border-radius: 7px; 
-                                padding-left: 12px; 
-                                padding-top: 18px; 
-                                padding-bottom: 18px; 
-                                line-height:25px;'>
-                                <i class='{iconname} fa-xs'></i> {i}
-                                </style><BR><span style='font-size: 14px; 
-                                margin-top: 0;'>{sline}</style></span></p>"""
-
-    st.markdown(lnk + htmlstr, unsafe_allow_html=True)
 
 col1, col2 = st.columns([1, 1])
 with col1:
-    st.markdown(f'<div style="text-align: left;">Net Lettable Area:</div>', unsafe_allow_html=True)
-    st.metric("Temperature", "70 °F", "1.2 °F")
-    st.write(code_selected)
+    st.markdown(kpi_card(theme_mode=theme_dark, kpi="energy", code=code), unsafe_allow_html=True)
 
 with col2:
-    st.markdown(f'<div style="text-align: left;">Net Lettable Area:</div>', unsafe_allow_html=True)
-    z = st.metric("Temperature", "70 °F", "1.2 °F")
-    st.markdown(f'<div style="text-align: left;">{z}:</div>', unsafe_allow_html=True)
-    st.write(code_selected)
-
-    wch_colour_box = (0, 204, 102)
-    wch_colour_font = (0, 0, 0)
-    fontsize = 18
-    valign = "left"
-    iconname = "fas fa-asterisk"
-    sline = "Observations"
-    lnk = '<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.1/css/all.css" crossorigin="anonymous">'
-    i = 123
-
-    htmlstr = f"""<p style='background-color: rgb({wch_colour_box[0]}, 
-                                                  {wch_colour_box[1]}, 
-                                                  {wch_colour_box[2]}, 0.75); 
-                            color: rgb({wch_colour_font[0]}, 
-                                       {wch_colour_font[1]}, 
-                                       {wch_colour_font[2]}, 0.75); 
-                            font-size: {fontsize}px; 
-                            border-radius: 7px; 
-                            padding-left: 12px; 
-                            padding-top: 18px; 
-                            padding-bottom: 18px; 
-                            line-height:25px;'>
-                            <i class='{iconname} fa-xs'></i> {i}
-                            </style><BR><span style='font-size: 14px; 
-                            margin-top: 0;'>{sline}</style></span></p>"""
-
-    st.markdown(lnk + htmlstr, unsafe_allow_html=True)
+    st.markdown(kpi_card(theme_mode=theme_dark, kpi="water", code=code), unsafe_allow_html=True)

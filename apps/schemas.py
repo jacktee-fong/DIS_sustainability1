@@ -2,6 +2,13 @@ from pydantic import BaseModel, Field
 from typing import Optional, Sequence
 
 
+class GeneralInput(BaseModel):
+    code: str = Field(title="Building Asset Code", default="SGX1")
+    time_now: int = Field(title="Time Now", default=1715217551)
+    tz_str: str = Field(title="Timezone", default="Asia/Singapore")
+    kpi: str = Field(title="KPI", default="energy")
+
+
 class BuildingDataResponse(BaseModel):
     code: str = Field(title="Building Asset Code")
     name: str = Field(title="Building Asset Name")
@@ -20,3 +27,10 @@ class BuildingDataResponse(BaseModel):
     working_day: Optional[int] = Field(title="working_day", description="Working day", default=22)
     description: Optional[str] = Field(title="description", description="Description of the building")
     photo: Optional[str] = Field(title="photo", description="base64 image")
+
+
+class KPICardResponse(BaseModel):
+    kpi: str = Field(title="KPI", default="energy")
+    kpi_current: float = Field(default=0)
+    kpi_last_year: float = Field(default=0)
+    different: float = Field(default=0)
