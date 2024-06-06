@@ -1,7 +1,10 @@
+import time
+
 import streamlit as st
-from streamlit_utils.utils import st_get_all_building, st_get_basic_data, kpi_card
+from streamlit_utils.utils import st_get_all_building, st_get_basic_data, kpi_card, get_monitoring_data
 from streamlit_utils.code_dict import code_dict
 from streamlit_theme import st_theme
+from apps.schemas import GeneralInput
 import os
 
 
@@ -49,6 +52,11 @@ with st.sidebar:
 col1, col2 = st.columns([1, 1])
 with col1:
     st.markdown(kpi_card(theme_mode=theme_dark, kpi="energy", code=code), unsafe_allow_html=True)
+    data = GeneralInput(code=code, kpi="energy", time_now = int(time.time()))
+    st.pyplot(get_monitoring_data(data), use_container_width=True)
 
 with col2:
     st.markdown(kpi_card(theme_mode=theme_dark, kpi="water", code=code), unsafe_allow_html=True)
+    data = GeneralInput(code=code, kpi="water", time_now = int(time.time()))
+    st.pyplot(get_monitoring_data(data))
+

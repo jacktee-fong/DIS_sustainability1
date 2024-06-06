@@ -34,3 +34,9 @@ class KPICardResponse(BaseModel):
     kpi_current: float = Field(default=0)
     kpi_last_year: float = Field(default=0)
     different: float = Field(default=0)
+
+
+class MonitoringDataResponse(BaseModel):
+    kpi: str = Field(title="KPI", default="energy")
+    x: list
+    y: list
