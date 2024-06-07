@@ -2,13 +2,14 @@ from fastapi import APIRouter, HTTPException
 from tools.general_utils import unix_to_datetime
 import pandas as pd
 from apps.schemas import BuildingDataResponse, GeneralInput, KPICardResponse, MonitoringDataResponse
+from streamlit_utils.code_dict import benchmark_dict
 import json
 
 
 router = APIRouter()
 
 
-@router.get('/allBuildingName')
+@router.get('/allBuildingName', response_model=dict)
 def get_all_building_name():
     df = pd.read_excel("store/basic_data.xlsx")
     name_list = df.name.to_list()
@@ -59,5 +60,58 @@ def get_monitoring_data(payload: GeneralInput):
         resp["x"].append(item.strftime('%Y-%m-%d'))
     resp["y"] = df_chart[payload.kpi].to_list()
     resp["kpi"] = payload.kpi
+    return resp
 
+
+@router.get('/BenchmarkChart', response_model=dict)
+def get_benchmark_chart(payload: GeneralInput):
+    # if the kpi selected is not Benchmark, raise HttpException error
+    if payload.kpi not in benchmark_dict.keys():
+        raise HTTPException(status_code=404, detail="Kpi selected is not benchmark")
+    year_now = unix_to_datetime(payload.time_now, payload.tz_str).year
+    df = pd.read_excel("store/clean_data.xlsx")
+    df["date"] = pd.to_datetime(df["month"]).dt.floor('D')
+    df["month"] = pd.to_datetime(df["month"])
+    unique_codes = list(set(df.code.to_list()))
+    benchmark_year_list = [2018, 2019, 2020, 2021, 2022, 2023, 2024]
+
+    resp = {"x": benchmark_year_list,
+            'cutOffYear': year_now,
+            'cutOff': benchmark_year_list.index(year_now),
+            "unit": benchmark_dict[payload.kpi]["year_unit"]}
+
+    data = {}
+    # filter and obtain the list of energy_obj based on the year selected
+    for obj in unique_codes:
+        data[obj] = []
+        df_codes = df[df["code"] == obj]
+        df_codes.set_index("month", inplace=True)
+
+        # iterate through every year to obtain the sum or average data
+        for year in resp["x"]:
+            temp_list = df_codes.loc[f"{year}-01-01":f"{year}-12-13"]
+
+            # check the kpi dict to seek the sum or average operation, and obtain the benchmark data if available
+            if benchmark_dict[payload.kpi]["type"] == "AVERAGE":
+                kpi = temp_list[payload.kpi].mean()
+            elif benchmark_dict[payload.kpi]["type"] == "SUM":
+                kpi = temp_list[payload.kpi].sum()
+            if not pd.isna(kpi):
+                data[obj].append(kpi)
+            else:
+                # TODO: what to do when kpi is null
+                # temporary set it to 0
+                data[obj].append(0)
+
+    # append the benchmark to response
+    if len(benchmark_dict[payload.kpi]["benchmark"]) > 0:
+        for keys, values in benchmark_dict[payload.kpi]["benchmark"].items():
+            resp[keys] = values
+
+    # sort the building in orders before append it to response
+    data1 = dict(sorted(data.items(), key=lambda item: (item[1][-1] is None, item[1][-1])))
+    data_iter = iter(data1)
+    for i in range(len(data1)):
+        keys = next(data_iter)
+        resp[keys] = data1[keys]
     return resp

@@ -40,3 +40,4 @@ class MonitoringDataResponse(BaseModel):
     kpi: str = Field(title="KPI", default="energy")
     x: list
     y: list
+

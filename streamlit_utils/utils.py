@@ -2,10 +2,12 @@ import requests
 import json
 from tools.general_utils import unix_to_datetime
 from apps.schemas import BuildingDataResponse, KPICardResponse, GeneralInput, MonitoringDataResponse
-from streamlit_utils.code_dict import icon_dict, kpi_dict
+from streamlit_utils.code_dict import icon_dict, kpi_dict, color_dict
 import time
 import matplotlib.pyplot as plt
+import random
 import pandas as pd
+
 
 BASE_URL = "http://127.0.0.1:9001"
 
@@ -114,8 +116,57 @@ def get_monitoring_data(payload: GeneralInput):
     x2 = data.x[cutoff_count -1:]
     y2 = data.y[cutoff_count -1:]
     plt.plot(x1, y1, marker='o', color=kpi_dict[payload.kpi]["color"],
-             linewidth=2)
+             linewidth=2, label=payload.kpi)
     plt.plot(x2, y2, marker='o', color=kpi_dict[payload.kpi]["color"],
              linewidth=2, linestyle='--')
     plt.xticks(rotation=45, ha='right')
+    plt.legend()
     return fig
+
+
+def st_get_benchmark(payload: GeneralInput):
+
+    z = requests.get(url=BASE_URL + "/dis_api/BenchmarkChart",
+                     headers={
+                         'accept': 'application/json',
+                         'Content-Type': 'application/json'},
+                     json={
+                         "code": payload.code,
+                         "time_now": payload.time_now,
+                         "kpi": payload.kpi,
+                     }
+                     )
+    data = json.loads(z.content)
+
+    fig, ax = plt.subplots(figsize=(10, 10))
+    plt.xlabel("Year")
+    plt.ylabel(data["unit"], fontsize=10)
+    plt.title(kpi_dict[payload.kpi]["name"] + " Benchmark", fontsize=10)
+
+    # get the data to plot
+    x1 = data["x"][0:data["cutOff"]]
+    x2 = data["x"][data["cutOff"] - 1:]
+
+    building_list = ["SGX1", "SGX2", "TP1", "TP2", "SC", "SLT", "UIC", "GWY"]
+    ignore_list = ["x", "cutOffYear", "cutOff", "unit"]
+    for keys in data.keys():
+        if keys in building_list:
+            y1 = data[keys][0:data["cutOff"]]
+            y2 = data[keys][data["cutOff"] - 1:]
+            # color_random = (random.uniform(0, 0.6), random.uniform(0.3, 0.8), random.uniform(0.4, 1))
+            color_random = (random.random(), random.random(), random.random())
+            plt.plot(x1, y1, marker='o', color=color_random,
+                     linewidth=2, label=keys)
+            plt.plot(x2, y2, marker='o', color=color_random,
+                     linewidth=2, linestyle='--')
+        elif keys not in ignore_list:
+            y1 = data[keys][0:data["cutOff"]]
+            y2 = data[keys][data["cutOff"] - 1:]
+            plt.plot(x1, y1, marker='o', color=kpi_dict[payload.kpi]["color"],
+                     linewidth=2, label=f"{keys} Benchmark")
+            plt.plot(x2, y2, marker='o', color=kpi_dict[payload.kpi]["color"],
+                     linewidth=2, linestyle='--')
+    plt.xticks(rotation=45, ha='right')
+    plt.legend()
+    return fig
+

@@ -1,7 +1,8 @@
 import time
 
 import streamlit as st
-from streamlit_utils.utils import st_get_all_building, st_get_basic_data, kpi_card, get_monitoring_data
+from streamlit_utils.utils import (st_get_all_building, st_get_basic_data, kpi_card, get_monitoring_data,
+                                   st_get_benchmark)
 from streamlit_utils.code_dict import code_dict
 from streamlit_theme import st_theme
 from apps.schemas import GeneralInput
@@ -24,7 +25,7 @@ else:
 with st.sidebar:
     # let user select the building for the dashboard
     code_selected = st.selectbox(
-        "",
+        "Please select a building",
         st_get_all_building()
     )
     code = code_dict[code_selected]
@@ -49,14 +50,21 @@ with st.sidebar:
         st.markdown(f'<div style="text-align: right;">{basic_data.net_area}</div>', unsafe_allow_html=True)
 
 
+st.markdown(f'<div style="text-align: center; font-size: 42px">Monitoring Data</div>', unsafe_allow_html=True)
 col1, col2 = st.columns([1, 1])
 with col1:
     st.markdown(kpi_card(theme_mode=theme_dark, kpi="energy", code=code), unsafe_allow_html=True)
-    data = GeneralInput(code=code, kpi="energy", time_now = int(time.time()))
+    data = GeneralInput(code=code, kpi="energy", time_now=int(time.time()))
     st.pyplot(get_monitoring_data(data), use_container_width=True)
 
 with col2:
     st.markdown(kpi_card(theme_mode=theme_dark, kpi="water", code=code), unsafe_allow_html=True)
-    data = GeneralInput(code=code, kpi="water", time_now = int(time.time()))
+    data = GeneralInput(code=code, kpi="water", time_now=int(time.time()))
     st.pyplot(get_monitoring_data(data))
 
+st.markdown(f'<div style="text-align: center; font-size: 42px"></div>', unsafe_allow_html=True)
+st.markdown(f'<div style="text-align: center; font-size: 42px">Benchmark Comparison</div>', unsafe_allow_html=True)
+
+for benchmark in ["EUI", "WEI_Area", "WEI_People"]:
+    data = GeneralInput(code=code, kpi=benchmark, time_now=int(time.time()))
+    st.pyplot(st_get_benchmark(data))
