@@ -12,9 +12,10 @@ import os
 # set up the basic config and parameter
 IMAGE_PATH = "store/photo"
 
+# this is to set the page title and layout
 st.set_page_config(page_title="DIS Sustainability", page_icon=':star', layout='wide')
 
-
+# obtain the theme of the browser
 theme_base = st_theme()
 if theme_base["base"] == "dark":
     theme_dark = True
@@ -26,7 +27,7 @@ with st.sidebar:
     # let user select the building for the dashboard
     code_selected = st.selectbox(
         "Please select a building",
-        st_get_all_building()
+        st_get_all_building()["name_list"]
     )
     code = code_dict[code_selected]
 
@@ -50,6 +51,7 @@ with st.sidebar:
         st.markdown(f'<div style="text-align: right;">{basic_data.net_area}</div>', unsafe_allow_html=True)
 
 
+# this is the main body content
 st.markdown(f'<div style="text-align: center; font-size: 42px">Monitoring Data</div>', unsafe_allow_html=True)
 col1, col2 = st.columns([1, 1])
 with col1:

@@ -1,10 +1,6 @@
-import os
 import uvicorn
-from importlib.util import find_spec
 from argparse import ArgumentParser
 from fastapi import FastAPI
-from fastapi.middleware.wsgi import WSGIMiddleware
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from apps.dis_api import router as dis_api_module
 
@@ -50,7 +46,7 @@ def get_args(debug=False):
 
 @app.get('/')
 async def root():
-    return {'message': 'Welcome to Kailash.'}
+    return {'message': 'Welcome to DIS API.'}
 
 
 app.mount('/dis_api', dis_api_module)
