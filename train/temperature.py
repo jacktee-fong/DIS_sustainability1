@@ -6,7 +6,7 @@ data = []
 # Calculate mean temperature for each sheet just once
 for year in range(2018, 2025):
     for month in range(1, 13):
-        # Stop after February 2024
+        # Stop after April 2024
         if year == 2024 and month > 4:
             break
         sheet_name = f"{year}{month:02d}"
