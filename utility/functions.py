@@ -1,4 +1,8 @@
 import pandas as pd
+import numpy as np
+from datetime import datetime
+import zoneinfo
+import torch
 
 df_holiday = pd.read_excel("../MOM_PublicHoliday.xlsx")
 
@@ -48,4 +52,25 @@ def calculate_carbon(row, variable, intensity):
     else:
         factor_index = intensity[year]['water_factor']
         return row["water"] * factor_index
+    
+def unix_to_datetime(x, tz_str):
+    timezone = zoneinfo.ZoneInfo(tz_str)
+    local_time = datetime.fromtimestamp(x, timezone)
+    return local_time
+
+
+def chronos_forecast(model, data, horizon, target, quantiles):
+    # Prepare the context
+    context = torch.tensor(data[target].values, dtype=torch.float32)
+    context = context.unsqueeze(0)  # Add batch dimension
+
+    # Predict the next 'horizon' data points
+    forecast = model.predict(context, horizon)  # shape [num_series, num_samples, horizon]
+
+    # Extract quantiles for forecast
+    low, median, high = np.quantile(forecast[0].numpy(), quantiles, axis=0)
+    
+    return low, median, high
+
+
 
