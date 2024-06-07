@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from tools.general_utils import unix_to_datetime
 import pandas as pd
 from apps.schemas import BuildingDataResponse, GeneralInput, KPICardResponse, MonitoringDataResponse
-from streamlit_utils.code_dict import benchmark_dict
+from tools.code_dict import benchmark_dict
 import json
 
 

@@ -3,7 +3,7 @@ import time
 import streamlit as st
 from streamlit_utils.utils import (st_get_all_building, st_get_basic_data, kpi_card, get_monitoring_data,
                                    st_get_benchmark)
-from streamlit_utils.code_dict import code_dict
+from tools.code_dict import code_dict
 from streamlit_theme import st_theme
 from apps.schemas import GeneralInput
 import os

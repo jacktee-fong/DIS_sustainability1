@@ -2,7 +2,7 @@ import requests
 import json
 from tools.general_utils import unix_to_datetime
 from apps.schemas import BuildingDataResponse, KPICardResponse, GeneralInput, MonitoringDataResponse
-from streamlit_utils.code_dict import icon_dict, kpi_dict, color_dict
+from tools.code_dict import icon_dict, kpi_dict
 import time
 import matplotlib.pyplot as plt
 import random
