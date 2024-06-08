@@ -3,19 +3,12 @@ import numpy as np
 import lightgbm as lgb
 import pickle
 
-def train_model(data_path, target, model_path):
-    # Load data
-    df_building = pd.read_excel(data_path)
-
-    # Rename the 'month' column to 'date' and extract 'month' and 'year'
-    df_building["date"] = df_building["month"]
-    df_building["month"] = df_building["date"].dt.month
-    df_building["year"] = df_building["date"].dt.year
+def train_model(df_building, train_date, val_date, target, model_path):
 
     # Define masks for training, testing, and validation sets
-    training_mask = df_building["date"] < "2022-01-01"
-    testing_mask = df_building["date"] >= "2022-01-01"
-    val_mask = df_building["date"] >= "2023-01-01"
+    training_mask = df_building["date"] < train_date
+    testing_mask = df_building["date"] >= train_date
+    val_mask = df_building["date"] >= val_date
 
     training_data = df_building[training_mask]
     testing_data = df_building[testing_mask]
@@ -48,12 +41,6 @@ def train_model(data_path, target, model_path):
     num_round = 5
     bst = lgb.train(params, train_data, num_round, valid_sets=[test_data])
 
-    # Save the model
-    with open(model_path, 'wb') as f:
-        pickle.dump(bst, f)
-
-    # Validation prediction
-    x_val = val_data[features]
-    predictions = bst.predict(x_val)
+    pickle.dump(bst, open(model_path, 'wb'))
     
-    return predictions
+    return bst

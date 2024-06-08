@@ -28,13 +28,13 @@ for codes, details in data_basic.items():
                                'Total water consumption (m3/mth)', 'No of Working days']]
 
     # rename the columns
-    df_building.columns = ["month", "energy", "water", "working_day"]
+    df_building.columns = ["date", "energy", "water", "working_day"]
 
     # check if the value is a date to ensure data consistency in the "Month" column 
     # drop all the rows where the "Month" column is not date
     z = df_building.to_dict("dict")
     row_to_drop = []
-    for keys, values in z["month"].items():
+    for keys, values in z["date"].items():
         if not isinstance(values, datetime.datetime):
             row_to_drop.append(keys)
     df_building = df_building.drop(index=row_to_drop)
@@ -62,5 +62,5 @@ for codes, details in data_basic.items():
 # making all the data easier to manage and manipulate
 combined_df = pd.concat(dataframe_building.values(), ignore_index=True)
 
-output_file_path = 'store/clean_data.xlsx'
+output_file_path = 'store/clean_data1.xlsx'
 combined_df.to_excel(output_file_path, sheet_name="Summary", index=False)

@@ -4,8 +4,6 @@ from datetime import datetime
 import zoneinfo
 import torch
 
-df_holiday = pd.read_excel("../MOM_PublicHoliday.xlsx")
-
 def calculate_working_days(dataframe):
     """
     Calculates the number of working days for each month in a DataFrame.
@@ -13,13 +11,15 @@ def calculate_working_days(dataframe):
     Returns: A DataFrame with the same index as the input DataFrame, containing a
     'working_days' column with the number of working days for each month.
     """
+    df_holiday = pd.read_excel("../MOM_PublicHoliday.xlsx")
+
     # create a dataframe to store the calculated 'working_day' for each month by intializing the value as 0 
     dataframe['working_day'] = 0
 
     # iterate through the input dataframe to calculate the 'working_day' for each month
     # remove the public holidays from all the weekdays for each month of the year 
     for index, row in dataframe.iterrows():
-        month = row['month']
+        month = row['date']
 
         start_date = month.replace(day=1)
         end_date = start_date + pd.offsets.MonthEnd(0)
@@ -45,13 +45,48 @@ def calculate_carbon(row, variable, intensity):
     intensity: A dictionary with the value'grid_emission_factor' for energy and 'water_factor' for water.
     Returns: A float that calculated carbon emissions based on the input row, variable and intensity.
     """
-    year = row["month"].year
+    year = row["date"].year
     if variable == "energy":
         factor_index = intensity[year]['grid_emission_factor']
         return row["energy"] * factor_index
     else:
         factor_index = intensity[year]['water_factor']
         return row["water"] * factor_index
+    
+def calculate_kpi(dataframe):
+    df_basic = pd.read_excel("store/basic_data.xlsx")
+
+    # set "tab" as index for easier checking with the "codes" 
+    df_basic.set_index("tab", inplace=True)
+    data_basic = df_basic.to_dict(orient="index")
+
+    df_intensity = pd.read_excel("store/basic_data.xlsx", sheet_name='power')
+    df_intensity.set_index("year", inplace=True)
+    data_intensity = df_intensity.to_dict(orient='index')
+
+    for index, row in dataframe.iterrows():
+        code = row['codes']
+        data_building = data_basic.get(code)
+
+        # check if the "codes" in df_building matches the "tab" in data_basic to get the "gfa" value
+        if data_building:
+            # Calculate EUI
+            dataframe.at[index, 'EUI'] = row['energy'] / data_building['gfa']
+
+            # assume that the number of staff per m^2 is 9.2 
+            # assume that the number of visitors is 10% of the staff 
+            # Calculate WEI
+            estimated_staff = data_building['gfa'] / 9.2
+            estimated_visitors = 0.10 * estimated_staff
+            dataframe.at[index, 'WEI (Area)'] = row['water'] * 1000 / data_building['gfa']
+            dataframe.at[index, 'WEI (People)'] = row['water'] * 1000 / (estimated_staff + 0.25 * estimated_visitors) / row['working_day']
+
+            # Calculate carbon emissions
+            dataframe.at[index, 'carbon_energy'] = calculate_carbon(row, 'energy', data_intensity)
+            dataframe.at[index, 'carbon_water'] = calculate_carbon(row, 'water', data_intensity)
+            dataframe.at[index, 'carbon_index'] = (dataframe.at[index, 'carbon_water'] + dataframe.at[index, 'carbon_energy']) / data_building['gfa'] / (estimated_staff 
+                                                                                                                                                            + 0.25 * estimated_visitors) * 10000
+    return dataframe
     
 def unix_to_datetime(x, tz_str):
     timezone = zoneinfo.ZoneInfo(tz_str)

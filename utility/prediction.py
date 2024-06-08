@@ -3,15 +3,12 @@ import numpy as np
 from dateutil.relativedelta import relativedelta
 import pickle
 from utility.functions import calculate_working_days
+from utility.functions import calculate_kpi
 from utility.functions import unix_to_datetime
 from utility.functions import chronos_forecast
-from train.lgbm_model import train_model
 from datetime import timedelta
 import torch
 from chronos import ChronosPipeline
-
-energy = train_model('store/train_data.xlsx', "energy", 'model/lgbm_energy_model.pkl')
-water = train_model('store/train_data.xlsx', "water", 'model/lgbm_water_model.pkl')
 
 pipelines = ChronosPipeline.from_pretrained(
     "amazon/chronos-t5-small",
@@ -19,7 +16,7 @@ pipelines = ChronosPipeline.from_pretrained(
     torch_dtype=torch.float32  # Using float32 for more precision in quantiles
 )
 
-def predict_lgbm(df_historical, time_now: int = 1685548800, tz_str: str = "Asia/Singapore", ):
+def predict_lgbm(df_building, time_now: int = 1685548800, tz_str: str = "Asia/Singapore", ):
 
     # Calculate the horizon of prediction
     time_now = unix_to_datetime(time_now, tz_str)
@@ -33,7 +30,7 @@ def predict_lgbm(df_historical, time_now: int = 1685548800, tz_str: str = "Asia/
     resp_df = pd.DataFrame()
 
     # Get unique codes
-    unique_codes = df_historical['code_number'].unique()
+    unique_codes = df_building['code_number'].unique()
 
     # Set a global random seed for consistency across function calls
     np.random.seed(84)
@@ -41,7 +38,7 @@ def predict_lgbm(df_historical, time_now: int = 1685548800, tz_str: str = "Asia/
     # Loop through each code to create the future DataFrame
     for code in unique_codes:
         # Generate future dates
-        temp_hist = df_historical[df_historical['code_number'] == code]
+        temp_hist = df_building[df_building['code_number'] == code]
 
         # Check if the filtered DataFrame is empty
         if temp_hist.empty:
@@ -52,25 +49,26 @@ def predict_lgbm(df_historical, time_now: int = 1685548800, tz_str: str = "Asia/
 
         temp_df = pd.DataFrame({
             'date': future_dates,
-            "working_day": 0, "code": code,
-            'temperature': np.random.uniform(temp_hist['temperature'].min(), temp_hist['temperature'].max(),len(future_dates))
+            'energy':0, 'water':0, "working_day": 0, 
+            'temperature': np.random.uniform(temp_hist['temperature'].min(), temp_hist['temperature'].max(),len(future_dates)),
+            "code_number": code,
         })
-        temp_df['month'] = temp_df['date']
+        temp_df['codes'] = temp_hist['codes'].iloc[-1]
+        temp_df['code'] = temp_hist['code'].iloc[-1]
+        temp_df['gfa'] = temp_hist['gfa'].iloc[-1]
+        temp_df['month'] = temp_df['date'].dt.month
         temp_df['year'] = temp_df['date'].dt.year
 
         temp_df.reset_index(drop=True, inplace=True)
-        # month column for calculation is in datetime
-        temp_df = calculate_working_days(temp_df)
 
-        # month column for feature is in int
-        temp_df['month'] = temp_df['date'].dt.month
+        temp_df = calculate_working_days(temp_df)
 
         resp_df = pd.concat([resp_df, temp_df])
     
     resp_df.reset_index(drop=True, inplace=True)
 
     # Prepare features for prediction
-    X_future = resp_df[["month", "year", "working_day", "temperature",  "code"]]
+    X_future = resp_df[["month", "year", "working_day", "temperature",  "code_number"]]
 
     energy = pickle.load(open("model/lgbm_energy_model.pkl", 'rb'))
     water = pickle.load(open("model/lgbm_water_model.pkl", 'rb'))
@@ -82,9 +80,13 @@ def predict_lgbm(df_historical, time_now: int = 1685548800, tz_str: str = "Asia/
     resp_df['energy'] = energy_pred
     resp_df['water'] = water_pred
 
+    resp_df.drop(columns=['temperature', 'month', 'year'], inplace=True)
+
+    resp_df = calculate_kpi(resp_df)
+
     return resp_df
 
-def predict_chronos(df_historical, time_now: int = 1685548800, tz_str: str = "Asia/Singapore"):
+def predict_chronos(df_building, time_now: int = 1685548800, tz_str: str = "Asia/Singapore"):
     # calculate the horizon of prediction
     time_now = unix_to_datetime(time_now, tz_str)
     max_possible_date = time_now + relativedelta(months=18)
@@ -96,12 +98,11 @@ def predict_chronos(df_historical, time_now: int = 1685548800, tz_str: str = "As
     resp_df = pd.DataFrame()
 
     # Get unique codes
-    unique_codes = df_historical['code_number'].unique()
+    unique_codes = df_building['code_number'].unique()
 
     for code in unique_codes:
 
-        temp_hist = df_historical[df_historical['code_number'] == code]
-        temp_hist.set_index("code_number", inplace=True)
+        temp_hist = df_building[df_building['code_number'] == code]
 
         # Check if the filtered DataFrame is empty
         if temp_hist.empty:
@@ -142,20 +143,22 @@ def predict_chronos(df_historical, time_now: int = 1685548800, tz_str: str = "As
             row_data = {"date": (df_pred.iloc[last_row_index]["date"] +
                                     timedelta(days=32)).replace(day=1),
                         "energy": low_energy[i], "water": low_water[i],
-                        "working_day": 0, "code": code}
+                        "working_day": 0, "code_number": code}
             temp_df = pd.DataFrame(row_data.items())
             temp_df = temp_df.T
             temp_df.columns = temp_df.iloc[0]
             temp_df = temp_df.drop(index=0)
+            temp_df['codes'] = temp_hist['codes'].iloc[-1]
+            temp_df['code'] = temp_hist['code'].iloc[-1]
+            temp_df['gfa'] = temp_hist['gfa'].iloc[-1]
             resp_df = pd.concat(([resp_df, temp_df]))
             df_pred = pd.concat([df_pred, temp_df])
             df_pred.reset_index(inplace=True, drop=True)
             last_row_index += 1
 
-    resp_df['month'] = resp_df['date']
-
     # calculate the working days of each month
     resp_df = calculate_working_days(resp_df)
+    resp_df = calculate_kpi(resp_df)
     return resp_df
 
 

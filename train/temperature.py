@@ -15,7 +15,7 @@ for year in range(2018, 2025):
             df_weather['Mean Temperature (°C)'] = pd.to_numeric(df_weather['Mean Temperature (°C)'], errors='coerce')
             mean_temp = df_weather['Mean Temperature (°C)'].mean()
             # Append the year, month, and mean temperature to the list
-            data.append({'month': f"{year}-{month:02d}", 'temperature': mean_temp})
+            data.append({'date': f"{year}-{month:02d}", 'temperature': mean_temp})
         except Exception as e:
             print(f"Failed to process {sheet_name}: {e}")
 
