@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import random
 
 
-BASE_URL = "http://127.0.0.1:9001"
+BASE_URL = "http://127.0.0.1:8000"
 
 
 def st_get_all_building():
@@ -23,7 +23,6 @@ def st_get_all_building():
                      json={}
                      )
     return json.loads(z.content)
-
 
 def st_get_basic_data(code):
     """
@@ -42,7 +41,7 @@ def st_get_basic_data(code):
     return BuildingDataResponse(**dict(json.loads(z.content)))
 
 
-def kpi_card(theme_mode, kpi, code):
+def kpi_card(theme_mode, kpi, code, model):
     """
     get data to display the kpi card
     :param theme_mode: str = "dark" or "light"
@@ -78,7 +77,8 @@ def kpi_card(theme_mode, kpi, code):
                      json={
                          "code": code,
                          "time_now": int(time.time()),
-                         "kpi": kpi
+                         "kpi": kpi,
+                         "model": model
                      }
                      )
     data = KPICardResponse(**dict(json.loads(data.content)))
@@ -134,6 +134,7 @@ def get_monitoring_data(payload: GeneralInput):
                          "code": payload.code,
                          "time_now": payload.time_now,
                          "kpi": payload.kpi,
+                         "model": payload.model
                      }
                      )
     data = MonitoringDataResponse(**dict(json.loads(z.content)))
@@ -182,6 +183,7 @@ def st_get_benchmark(payload: GeneralInput):
                          "code": payload.code,
                          "time_now": payload.time_now,
                          "kpi": payload.kpi,
+                         "model": payload.model,
                      }
                      )
     data = json.loads(z.content)

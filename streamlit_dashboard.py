@@ -31,6 +31,11 @@ with st.sidebar:
     )
     code = code_dict[code_selected]
 
+    model_selected = st.selectbox(
+        "Please select a model to predict",
+        ("LGBM", "Chronos")
+    )
+
     # populate the basic data information in the sidebar
     basic_data = st_get_basic_data(code)
     st.write(basic_data.address)
@@ -55,18 +60,22 @@ with st.sidebar:
 st.markdown(f'<div style="text-align: center; font-size: 42px">Monitoring Data</div>', unsafe_allow_html=True)
 col1, col2 = st.columns([1, 1])
 with col1:
-    st.markdown(kpi_card(theme_mode=theme_dark, kpi="energy", code=code), unsafe_allow_html=True)
-    data = GeneralInput(code=code, kpi="energy", time_now=int(time.time()))
+    st.markdown(kpi_card(theme_mode=theme_dark, kpi="energy", code=code, model = model_selected), unsafe_allow_html=True)
+    data = GeneralInput(code=code, kpi="energy", time_now=int(time.time()), model = model_selected)
     st.pyplot(get_monitoring_data(data), use_container_width=True)
 
 with col2:
-    st.markdown(kpi_card(theme_mode=theme_dark, kpi="water", code=code), unsafe_allow_html=True)
-    data = GeneralInput(code=code, kpi="water", time_now=int(time.time()))
+    st.markdown(kpi_card(theme_mode=theme_dark, kpi="water", code=code, model=model_selected), unsafe_allow_html=True)
+    data = GeneralInput(code=code, kpi="water", time_now=int(time.time()), model = model_selected)
     st.pyplot(get_monitoring_data(data))
 
 st.markdown(f'<div style="text-align: center; font-size: 42px"></div>', unsafe_allow_html=True)
 st.markdown(f'<div style="text-align: center; font-size: 42px">Benchmark Comparison</div>', unsafe_allow_html=True)
 
-for benchmark in ["EUI", "WEI_Area", "WEI_People"]:
-    data = GeneralInput(code=code, kpi=benchmark, time_now=int(time.time()))
-    st.pyplot(st_get_benchmark(data))
+benchmark = st.selectbox(
+        "Please select a benchmark",
+        ("EUI", "WEI_Area", "WEI_People", "carbon_index","carbon_energy", "carbon_water")
+    )
+
+data = GeneralInput(code=code, kpi=benchmark, time_now=int(time.time()), model = model_selected)
+st.pyplot(st_get_benchmark(data))

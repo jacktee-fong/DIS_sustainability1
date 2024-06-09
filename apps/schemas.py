@@ -7,6 +7,7 @@ class GeneralInput(BaseModel):
     time_now: int = Field(title="Time Now", default=1715217551)
     tz_str: str = Field(title="Timezone", default="Asia/Singapore")
     kpi: str = Field(title="KPI", default="energy")
+    model: str = Field(title="Model", default="LGBM")
 
 
 class BuildingDataResponse(BaseModel):

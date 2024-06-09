@@ -20,6 +20,37 @@ def get_all_building_name():
     code_list = df.code.to_list()
     return {"name_list": name_list, "code_list": code_list}
 
+@router.get('/predictData', response_model=dict)
+def get_model_data(model):
+    """
+    get the predicted data from Excel file based on the selected prediction model.
+    :param model: str = "LGBM" or "Chronos"
+    :return: dict of the dataset 
+    """
+    # initialize an empty DataFrame to store the combined data
+    df_full = pd.DataFrame()
+
+    # load the original dataset from an Excel file
+    df = pd.read_excel("store/clean_data.xlsx")
+    
+    # check the model selected to retrieve the respective dataset 
+    if model == "Chronos":
+        df_predict = pd.read_excel("store/clean_data_chronos.xlsx")
+    elif model == "LGBM":
+        df_predict = pd.read_excel("store/clean_data_lgbm.xlsx")
+    
+    unique_codes = list(set(df_predict.code.to_list()))
+
+    # combine the original data with predicted data for each code 
+    for code in unique_codes:
+        df_code = df[df["code"] == code]
+        df_pred = df_predict[df_predict["code"] == code]
+        # combine the row from both datasets
+        df_combine= pd.concat([df_code, df_pred],ignore_index=True)
+        # Append the combined data to df_full
+        df_full = pd.concat([df_full, df_combine], ignore_index=True)
+    
+    return df_full.to_dict(orient='records')
 
 @router.get('/buildingData', response_model=BuildingDataResponse)
 def get_building_data(payload: GeneralInput):
@@ -59,14 +90,14 @@ def get_kpi_card_data(payload: GeneralInput):
     date_last_year = time_now.replace(day=1).replace(year=date_now.year - 1)
 
     # read the data from Excel and filter it accordingly
-    df = pd.read_excel("store/clean_data.xlsx")
+    df = pd.DataFrame(get_model_data(payload.model))
     df_code = df[df["code"] == payload.code]
 
     # make sure this column is a datetime format
-    df_code["month"] = pd.to_datetime(df_code["month"])
+    df_code["date"] = pd.to_datetime(df_code["date"])
 
     # set the month as index, so we could use loc to select data within the range
-    df_code.set_index("month", inplace=True, drop=True)
+    df_code.set_index("date", inplace=True, drop=True)
 
     # obtain the data of current and last year and calculate the different
     kpi_current = df_code.loc[date_now.strftime('%Y-%m-%d')][payload.kpi]
@@ -91,16 +122,16 @@ def get_monitoring_data(payload: GeneralInput):
     year_end = time_now.replace(month=12).replace(day=31).strftime('%Y-%m-%d')
 
     # get the data of the building that we want to see
-    df = pd.read_excel("store/clean_data.xlsx")
+    df = pd.DataFrame(get_model_data(payload.model))
     df_code = df[df["code"] == payload.code]
-
+    
     # set the month as index, so we could use date to select the time range
-    df_code.set_index("month", inplace=True, drop=True)
+    df_code.set_index("date", inplace=True, drop=True)
     df_chart = df_code.loc[year_start:year_end]
     df_chart.reset_index(inplace=True)
 
     # convert datetime object to date only to display on chart
-    df_chart["date"] = pd.to_datetime(df_chart["month"]).dt.floor('D')
+    df_chart["date"] = pd.to_datetime(df_chart["date"]).dt.floor('D')
 
     # this is the x-axis data (date)
     date_list = df_chart["date"].to_list()
@@ -131,16 +162,22 @@ def get_benchmark_chart(payload: GeneralInput):
 
     # get the current year to calculate the cutoff
     year_now = unix_to_datetime(payload.time_now, payload.tz_str).year
-    df = pd.read_excel("store/clean_data.xlsx")
+
+    df = pd.DataFrame(get_model_data(payload.model))
 
     # make sure the column "month" is datetime
-    df["month"] = pd.to_datetime(df["month"])
+    df["date"] = pd.to_datetime(df["date"])
 
     # find out the unique code from the list to iterate through
     unique_codes = list(set(df.code.to_list()))
 
-    # TODO: currently hardcode the year. Can change the code to obtain earlier and latest year to generate the list
-    benchmark_year_list = [2018, 2019, 2020, 2021, 2022, 2023, 2024]
+    # find out the earliest and latest year of the list
+    earliest_year = df["date"].dt.year.min()
+    latest_year = df["date"].dt.year.max()
+
+    # Generate a list of years from the earliest to the latest year
+    # benchmark_year_list = [2018, 2019, 2020, 2021, 2022, 2023, 2024]
+    benchmark_year_list = list(range(earliest_year, latest_year + 1))
 
     # these are the standard data that needed to send over as response
     resp = {"x": benchmark_year_list,
@@ -155,7 +192,7 @@ def get_benchmark_chart(payload: GeneralInput):
     for obj in unique_codes:
         data[obj] = []
         df_codes = df[df["code"] == obj]
-        df_codes.set_index("month", inplace=True)
+        df_codes.set_index("date", inplace=True)
 
         # iterate through every year to obtain the sum or average data
         for year in resp["x"]:

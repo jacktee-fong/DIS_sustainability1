@@ -38,7 +38,7 @@ def get_args(debug=False):
     )
 
     if debug:
-        argv = ["--host", '0.0.0.0', "--port", '9001', "--uvicorn", "TRUE"]
+        argv = ["--host", '0.0.0.0', "--port", '8000', "--uvicorn", "TRUE"]
         return parser.parse_args(argv)
     else:
         return parser.parse_args()
