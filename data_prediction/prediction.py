@@ -192,13 +192,10 @@ def predict_chronos(df_building, time_now: int = 1685548800, tz_str: str = "Asia
             df_pred.reset_index(inplace=True, drop=True)
             last_row_index += 1
 
-    print(resp_df.head())
-
     resp_df.reset_index(drop=True, inplace=True)
 
     # calculate the working days for each month
     resp_df = calculate_working_days(resp_df)
-    print(resp_df.head()) 
 
     # Remove the unecessary column
     resp_df.drop(columns=['code_number'], inplace=True)
