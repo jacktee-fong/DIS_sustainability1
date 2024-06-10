@@ -3,7 +3,7 @@ import datetime
 from utility.functions import calculate_working_days
 
 # read and load the necessary excel file 
-df_basic = pd.read_excel("store/basic_data.xlsx")
+df_basic = pd.read_excel("store/input/basic_data.xlsx")
 
 # set the "code" column as the index for dataframe for easier retrieve rows by index
 df_basic.set_index("code", inplace=True)
@@ -20,7 +20,7 @@ for codes, details in data_basic.items():
     data_building = data_basic[codes]
 
     # skip the first 11 rows to get the data needed 
-    df_building = pd.read_excel("store/singland mock.xlsx", sheet_name=data_building['tab'], skiprows=11)
+    df_building = pd.read_excel("store/input/singland mock.xlsx", sheet_name=data_building['tab'], skiprows=11)
 
     # only keep columns that have value
     df_building = df_building[['Month',
@@ -60,5 +60,5 @@ for codes, details in data_basic.items():
 # making all the data easier to manage and manipulate
 combined_df = pd.concat(dataframe_building.values(), ignore_index=True)
 
-output_file_path = 'store/clean_data.xlsx'
+output_file_path = 'store/output/clean_data.xlsx'
 combined_df.to_excel(output_file_path, sheet_name="Summary", index=False)
