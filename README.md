@@ -1,4 +1,4 @@
-# Module 2: Time Series Forecasting with LightGBM and AWS Chronos
+# Module 2: Data Forecasting
 
 ## Overview
 This module explores time series forecasting using LightGBM and AWS Chronos, focusing on training, deploying, and leveraging these tools to achieve high prediction accuracy in handling time-sensitive data.
