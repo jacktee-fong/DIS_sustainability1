@@ -11,7 +11,7 @@ for year in range(2018, 2025):
             break
         sheet_name = f"{year}{month:02d}"
         try:
-            df_weather = pd.read_excel("store/Weather_Data_Newton_2018_to_2024.xlsx", sheet_name=sheet_name)
+            df_weather = pd.read_excel("store/input/Weather_Data_Newton_2018_to_2024.xlsx", sheet_name=sheet_name)
             df_weather['Mean Temperature (°C)'] = pd.to_numeric(df_weather['Mean Temperature (°C)'], errors='coerce')
             mean_temp = df_weather['Mean Temperature (°C)'].mean()
             # Append the year, month, and mean temperature to the list
@@ -22,5 +22,5 @@ for year in range(2018, 2025):
 # Convert the list of dictionaries to a DataFrame
 df_temperature = pd.DataFrame(data)
 
-output_file_path = 'store/temperature_data.xlsx'
+output_file_path = 'store/input/temperature_data.xlsx'
 df_temperature.to_excel(output_file_path, index=False)

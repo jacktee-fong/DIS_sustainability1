@@ -1,7 +1,6 @@
 import pandas as pd
 from utility.prediction import predict_chronos
 from utility.prediction import predict_lgbm
-from utility.functions import calculate_kpi
 
 # Load the building data
 df_building = pd.read_excel("store/train_data.xlsx")
