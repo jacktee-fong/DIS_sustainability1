@@ -2,9 +2,9 @@
 
 ## Overview
 This module focuses on preparing data for analysis and calculating key performance indicators (KPIs) that are crucial for assessing environmental efficiency. 
-The processes involve data cleaning and computing metrics such as Energy Utilization Index (EUI), Water Efficiency Index (WEI), and Carbon Index.
+The processes involve data cleaning and computing metrics such as Energy Utilization Index (EUI), Water Efficiency Index (WEI) and Carbon Index.
 
-## Tasks
+## Objectives
 
 ### Data Cleaning
 - Prepare and clean data extracted from Excel files
