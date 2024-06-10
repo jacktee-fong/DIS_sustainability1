@@ -22,5 +22,5 @@ for year in range(2018, 2025):
 # Convert the list of dictionaries to a DataFrame
 df_temperature = pd.DataFrame(data)
 
-output_file_path = 'store/input/temperature_data.xlsx'
+output_file_path = 'store/predict/temperature_data.xlsx'
 df_temperature.to_excel(output_file_path, index=False)

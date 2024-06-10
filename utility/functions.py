@@ -11,7 +11,7 @@ def calculate_working_days(dataframe):
     Returns: A DataFrame with the same index as the input DataFrame, containing a
     'working_days' column with the number of working days for each month.
     """
-    df_holiday = pd.read_excel("../MOM_PublicHoliday.xlsx")
+    df_holiday = pd.read_excel("store/input/MOM_PublicHoliday.xlsx")
 
     # create a dataframe to store the calculated 'working_day' for each month by intializing the value as 0 
     dataframe['working_day'] = 0
@@ -31,13 +31,10 @@ def calculate_working_days(dataframe):
         holidays = df_holiday[(df_holiday['Date'].dt.month == month.month) & (df_holiday['Date'].dt.year == month.year)]
 
         working_days = len(weekdays) - len(holidays)
-        print(working_days)
 
         # assign the calculated 'working_days' to 'working_day' column for corresponding row 
         dataframe.at[index, 'working_day'] = working_days
-        # dataframe['working_day'] = working_days
 
-    print(dataframe)
     return dataframe
 
 def calculate_carbon(row, variable, intensity):
@@ -66,13 +63,13 @@ def calculate_kpi(dataframe):
     Params: dataframe : A DataFrame that contains data for building codes, energy and water.
     Returns:dataframe: The input DataFrame with additional columns for calculated KPI.
     """
-    df_basic = pd.read_excel("store/basic_data.xlsx")
+    df_basic = pd.read_excel("store/input/basic_data.xlsx")
 
     # set "tab" as index for easier checking with the "codes" 
     df_basic.set_index("tab", inplace=True)
     data_basic = df_basic.to_dict(orient="index")
 
-    df_intensity = pd.read_excel("store/basic_data.xlsx", sheet_name='power')
+    df_intensity = pd.read_excel("store/input/basic_data.xlsx", sheet_name='power')
     df_intensity.set_index("year", inplace=True)
     data_intensity = df_intensity.to_dict(orient='index')
 

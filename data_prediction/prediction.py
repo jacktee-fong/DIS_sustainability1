@@ -2,8 +2,7 @@ import pandas as pd
 import numpy as np
 from dateutil.relativedelta import relativedelta
 import pickle
-from utility.functions import calculate_working_days
-from utility.functions import calculate_kpi
+from utility.functions import calculate_working_days, calculate_kpi
 from utility.functions import unix_to_datetime
 from utility.functions import chronos_forecast
 from datetime import timedelta
