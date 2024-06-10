@@ -15,7 +15,7 @@ def get_all_building_name():
     get all building name and code from Excel file
     :return: dict = {"name_list": list, "code_list": list}
     """
-    df = pd.read_excel("store/basic_data.xlsx")
+    df = pd.read_excel("store/input/basic_data.xlsx")
     name_list = df.name.to_list()
     code_list = df.code.to_list()
     return {"name_list": name_list, "code_list": code_list}
@@ -27,7 +27,7 @@ def get_building_data(payload: GeneralInput):
     :param payload: GeneralInput
     :return: BuildingDataResponse
     """
-    df = pd.read_excel("store/basic_data.xlsx")
+    df = pd.read_excel("store/input/basic_data.xlsx")
 
     # get the data into dictionary
     data_dict = df[df["code"] == payload.code].to_dict(orient='records')[0]

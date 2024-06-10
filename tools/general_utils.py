@@ -24,13 +24,13 @@ def get_model_data(model):
     df_full = pd.DataFrame()
 
     # load the original dataset from an Excel file
-    df = pd.read_excel("store/clean_data.xlsx")
+    df = pd.read_excel("store/output/clean_data.xlsx")
     
     # check the model selected to retrieve the respective dataset 
     if model == "Chronos":
-        df_predict = pd.read_excel("store/clean_data_chronos.xlsx")
+        df_predict = pd.read_excel("store/output/clean_data_chronos.xlsx")
     elif model == "LGBM":
-        df_predict = pd.read_excel("store/clean_data_lgbm.xlsx")
+        df_predict = pd.read_excel("store/output/clean_data_lgbm.xlsx")
     
     unique_codes = list(set(df_predict.code.to_list()))
 
