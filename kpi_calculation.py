@@ -30,8 +30,8 @@ for index, row in df_building.iterrows():
         # Calculate WEI
         estimated_staff = data_building['gfa'] / 9.2
         estimated_visitors = 0.10 * estimated_staff
-        df_building.at[index, 'WEI (Area)'] = row['water'] * 1000 / data_building['gfa']
-        df_building.at[index, 'WEI (People)'] = row['water'] * 1000 / (estimated_staff + 0.25 * estimated_visitors) / row['working_day']
+        df_building.at[index, 'WEI_Area'] = row['water'] / data_building['gfa']
+        df_building.at[index, 'WEI_People'] = row['water'] * 1000 / (estimated_staff + 0.25 * estimated_visitors) / row['working_day']
 
         # Calculate carbon emissions
         df_building.at[index, 'carbon_energy'] = calculate_carbon(row, 'energy', data_intensity)

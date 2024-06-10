@@ -62,5 +62,5 @@ for codes, details in data_basic.items():
 # making all the data easier to manage and manipulate
 combined_df = pd.concat(dataframe_building.values(), ignore_index=True)
 
-output_file_path = 'store/clean_data1.xlsx'
+output_file_path = 'store/clean_data.xlsx'
 combined_df.to_excel(output_file_path, sheet_name="Summary", index=False)
