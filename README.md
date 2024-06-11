@@ -4,10 +4,15 @@
 This module delves into the fundamentals of data visualization, focusing on using Streamlit to create interactive charts and FastAPI to handle data retrieval. 
 Students will learn to build dynamic visual interfaces and APIs that can fetch and display data efficiently.
 
-## Objectives
-- Develop interactive data visualizations using Streamlit
-- Implement FastAPI to retrieve data that feeds into visualizations
-- Integrate Streamlit with FastAPI to create a seamless data flow and visualization experience
+## Workflow
+### Step 1: Set Up FastAPI for Data Retrieval
+First, set up FastAPI to create endpoints for data retrieval.
+### Step 2: Set Up Streamlit for Data Visualization
+Next, set up Streamlit to create interactive charts.
+### Step 3: Integrate Streamlit with FastAPI
+Ensure that Streamlit fetches data from the FastAPI endpoint and updates the visualizations accordingly.
+### Step 4: Add component or feature 
+Enhance the visualizations with more interactivity and customization using Streamlit's built-in features.
 
 ## What You Will Learn
 - **Data Visualizations**: Learn to create charts with Matplotlib and enhance user interactivity with Streamlit
