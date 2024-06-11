@@ -14,7 +14,7 @@ def train_model(df_building, train_date, val_date, target, model_path):
     Return: bst: trained LightGBM model.
     """
 
-    # Define masks for training, testing, and validation sets
+    # define masks for training, testing, and validation sets
     # rows with dates before 'train_date' will be included in the training set
     # rows with dates on or after 'train_date' will be included in the testing set
     training_mask = df_building["date"] < train_date

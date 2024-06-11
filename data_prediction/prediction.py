@@ -12,7 +12,7 @@ from chronos import ChronosPipeline
 pipelines = ChronosPipeline.from_pretrained(
     "amazon/chronos-t5-small",
     device_map="cuda" if torch.cuda.is_available() else "cpu",
-    torch_dtype=torch.float32  # Using float32 for more precision in quantiles
+    torch_dtype=torch.float32  
 )
 
 def predict_lgbm(df_building, time_now: int = 1685548800, tz_str: str = "Asia/Singapore", ):
@@ -156,7 +156,7 @@ def predict_chronos(df_building, time_now: int = 1685548800, tz_str: str = "Asia
         if temp_hist.empty:
             continue
         
-         # get the last entry date by extracting the last row of 'date' column from 'temp_hist'
+        # get the last entry date by extracting the last row of 'date' column from 'temp_hist'
         entry_last = temp_hist['date'].iloc[-1]
 
         # Set the prediction horizon based on the month difference between the last entry date and the end of estimation.
