@@ -7,7 +7,7 @@ import time
 import matplotlib.pyplot as plt
 import random
 
-
+# define base URL for API endpoints
 BASE_URL = "http://127.0.0.1:8000"
 
 
@@ -16,12 +16,15 @@ def st_get_all_building():
     get all building name from backend
     :return: {"name_list": ["building1", "building2"], "code_list": ["code1", "code2"]}
     """
+    # send a GET request to the API endpoint to get all building names
     z = requests.get(url=BASE_URL + "/dis_api/allBuildingName",
                      headers={
                          'accept': 'application/json',
                          'Content-Type': 'application/json'},
                      json={}
                      )
+    
+    # parse the JSON response content and return it
     return json.loads(z.content)
 
 def st_get_basic_data(code):
@@ -30,6 +33,10 @@ def st_get_basic_data(code):
     :param code: building code
     :return: BuildingDataResponse
     """
+    # send a GET request to the API endpoint to get basic data for the given building code
+    # url: The URL of the API endpoint. Combine the BASE_URL with the specific endpoint for building data. 
+    # headers: 'accept' to specify that we expect a JSON response and 'Content-Type' to indicate that the request payload is in JSON format.
+    # json: The JSON payload containing the building code. This is a dictionary with "code" as the key and the building code as the value.
     z = requests.get(url=BASE_URL + "/dis_api/buildingData",
                      headers={
                          'accept': 'application/json',
@@ -38,6 +45,7 @@ def st_get_basic_data(code):
                          "code": code
                      }
                      )
+    # parse the JSON response content and return it as a BuildingDataResponse object
     return BuildingDataResponse(**dict(json.loads(z.content)))
 
 
@@ -58,10 +66,10 @@ def kpi_card(theme_mode, kpi, code, model):
         wch_colour_box = (250, 251, 252)
         wch_colour_font = (0, 0, 0)
 
-    # obtain the icon to display in the card
+    # obtain the icon to display in the card from the icon_dict
     kpi_icon = icon_dict[kpi]
 
-    # obtain the unit and name to display in the card
+    # obtain the unit and name to display in the card based on the KPI type
     if kpi == "water":
         kpi_str = "Water"
         kpi_unit = " m3/month"
@@ -126,6 +134,7 @@ def get_monitoring_data(payload: GeneralInput):
     :param payload: GeneralInput
     :return: a matplotlib figure
     """
+    # send a GET request to the API endpoint to get monitoring data
     z = requests.get(url=BASE_URL + "/dis_api/MonitoringData",
                      headers={
                          'accept': 'application/json',
@@ -146,7 +155,7 @@ def get_monitoring_data(payload: GeneralInput):
     # plotting matplotlib figure, first set the figure size
     fig, ax = plt.subplots(figsize=(6, 6))
 
-    # give the title and label name
+    # set the title and label name for plot
     plt.xlabel("Date")
     plt.ylabel(kpi_dict[payload.kpi]["unit"], fontsize=10)
     plt.title(kpi_dict[payload.kpi]["name"] + " Consumption", fontsize=10)
@@ -164,7 +173,7 @@ def get_monitoring_data(payload: GeneralInput):
     # x-axis label rotate 45 degree
     plt.xticks(rotation=45, ha='right')
 
-    # plot legend
+    # Add a legend to the plot
     plt.legend()
     return fig
 
@@ -175,6 +184,7 @@ def st_get_benchmark(payload: GeneralInput):
     :param payload: GeneralInput
     :return: matplotlib figure
     """
+    # send a GET request to the API endpoint to get benchmark data
     z = requests.get(url=BASE_URL + "/dis_api/BenchmarkChart",
                      headers={
                          'accept': 'application/json',
@@ -191,7 +201,7 @@ def st_get_benchmark(payload: GeneralInput):
     # plotting matplotlib figure, first set the figure size
     fig, ax = plt.subplots(figsize=(15, 15))
 
-    # give the title and label name
+    # set the title and label name for the plot
     plt.xlabel("Year")
     plt.ylabel(data["unit"], fontsize=10)
     plt.title(kpi_dict[payload.kpi]["name"] + " Benchmark", fontsize=10)
