@@ -15,7 +15,7 @@ def calculate_working_days(dataframe):
     # iterate through the input dataframe to calculate the 'working_day' for each month
     # remove the public holidays from all the weekdays for each month of the year 
     for index, row in dataframe.iterrows():
-        month = row['month']
+        month = row['date']
 
         start_date = month.replace(day=1)
         end_date = start_date + pd.offsets.MonthEnd(0)
@@ -41,7 +41,7 @@ def calculate_carbon(row, variable, intensity):
     intensity: A dictionary with the value'grid_emission_factor' for energy and 'water_factor' for water.
     Returns: A float that calculated carbon emissions based on the input row, variable and intensity.
     """
-    year = row["month"].year
+    year = row["date"].year
     if variable == "energy":
         factor_index = intensity[year]['grid_emission_factor']
         return row["energy"] * factor_index
