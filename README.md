@@ -8,8 +8,8 @@ This module focuses on preparing data for analysis and calculating key performan
 ### Step 1: Data Cleaning
 - **Import Data** : Load data from Excel files.
 - **Handle Missing Values** : Identify and fill or remove missing values.
-- **Merge Datasets** : Combine multiple datasets into a single dataset.
 - **Filter Data** : Clean and filter the data to ensure it is complete and accurate.
+- **Merge Datasets** : Combine multiple datasets into a single dataset.
 
 ### Step 2: KPI Calculation
 - **Energy Utilization Index (EUI)**
