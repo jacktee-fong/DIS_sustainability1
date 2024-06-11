@@ -41,7 +41,10 @@ def calculate_carbon(row, variable, intensity):
     intensity: A dictionary with the value'grid_emission_factor' for energy and 'water_factor' for water.
     Returns: A float that calculated carbon emissions based on the input row, variable and intensity.
     """
+    # extract year from the 'date' column
     year = row["date"].year
+
+    # select the appropriate emission factor based on the variable and year
     if variable == "energy":
         factor_index = intensity[year]['grid_emission_factor']
         return row["energy"] * factor_index
