@@ -1,25 +1,24 @@
 # Module 1: Data Cleaning
 
 ## Overview
-This module focuses on preparing data for analysis and calculating key performance indicators (KPIs) that are crucial for assessing environmental efficiency. 
-The processes involve data cleaning and computing metrics such as Energy Utilization Index (EUI), Water Efficiency Index (WEI) and Carbon Index.
+This module focuses on preparing data for analysis and calculating key performance indicators (KPIs) crucial for assessing environmental efficiency. The processes involve data cleaning followed by computing metrics such as Energy Utilization Index (EUI), Water Efficiency Index (WEI), and Carbon Index.
 
-## Objectives
+## Workflow
 
-### Data Cleaning
-- Prepare and clean data extracted from Excel files
-- Ensure the data is complete and accurate for KPI calculation
+### Step 1: Data Cleaning
+- **Import Data** : Load data from Excel files.
+- **Handle Missing Values** : Identify and fill or remove missing values.
+- **Merge Datasets** : Combine multiple datasets into a single dataset.
+- **Filter Data** : Clean and filter the data to ensure it is complete and accurate.
 
-### KPI Calculation
-- Calculate the following key performance indicators:
-  - Energy Utilization Index (EUI)
-  - Water Efficiency Index (WEI)
-  - Carbon Index
-- These indicators are essential for measuring the environmental impact
+### Step 2: KPI Calculation
+- **Energy Utilization Index (EUI)**
+- **Water Efficiency Index (WEI)**
+- **Carbon Index**
 
 ## What You Will Learn
-- **Data Import and Export**:  Gain proficiency in using libraries to load and save data in Excel file
-- **Data Cleaning**: Learn to handle missing values, merge multiple datasets and filter data
+- **Data Import and Export**: Gain proficiency in using libraries to load and save data in Excel files.
+- **Data Cleaning**: Learn to handle missing values, merge multiple datasets, and filter data.
 
 ## References
 - https://www.ema.gov.sg/resources/singapore-energy-statistics/chapter2
