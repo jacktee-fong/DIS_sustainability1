@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from tools.general_utils import unix_to_datetime
-from data_utils import get_model_data
+from apps.data_utils import get_model_data
 import pandas as pd
 from apps.schemas import BuildingDataResponse, GeneralInput, KPICardResponse, MonitoringDataResponse
 from tools.code_dict import benchmark_dict
