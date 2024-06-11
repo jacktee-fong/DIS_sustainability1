@@ -15,7 +15,7 @@ def calculate_working_days(dataframe):
     # iterate through the input dataframe to calculate the 'working_day' for each month
     # remove the public holidays from all the weekdays for each month of the year 
     for index, row in dataframe.iterrows():
-        month = row['month']
+        month = row['date']
 
         start_date = month.replace(day=1)
         end_date = start_date + pd.offsets.MonthEnd(0)
@@ -31,4 +31,26 @@ def calculate_working_days(dataframe):
         # assign the calculated 'working_days' to 'working_day' column for corresponding row 
         dataframe.at[index, 'working_day'] = working_days
     return dataframe
+
+def calculate_carbon(row, variable, intensity):
+    """
+    Calculate the carbon emissions for a given row of data based on 'energy' and 'water'.
+    Args:
+    row: An object represents a row of dataframe that includes key like month, energy and water. 
+    variable: A string as the type of variable to calculate emissions for 'energy' or 'water'.
+    intensity: A dictionary with the value'grid_emission_factor' for energy and 'water_factor' for water.
+    Returns: A float that calculated carbon emissions based on the input row, variable and intensity.
+    """
+    # extract year from the 'date' column
+    year = row["date"].year
+
+    # select the appropriate emission factor from the intensity dict based on the specified variable and the year
+    # 'variable' can be either 'energy' or 'water', and it determines which factor to use
+    # calculate and return the carbon emissions for the specified variable by multiplying the value in the current row with the emission factor
+    if variable == "energy":
+        factor_index = intensity[year]['grid_emission_factor']
+        return row["energy"] * factor_index
+    else:
+        factor_index = intensity[year]['water_factor']
+        return row["water"] * factor_index
 
