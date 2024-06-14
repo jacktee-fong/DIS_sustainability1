@@ -62,23 +62,23 @@ with st.sidebar:
     st.image(image_path)
 
     # Use columns to display additional building information
-    # create two columns with a 2:1 width ratio
-    col1, col2 = st.columns([2, 1])
+    # create two columns with a 3:2 width ratio
+    col1, col2 = st.columns([3, 2])
 
     with col1:
         # display labels for building information
         st.markdown(f'<div style="text-align: left;">Net Lettable Area:</div>', unsafe_allow_html=True)
         st.markdown(f'<div style="text-align: left;">Typical Floor Area(s):</div>', unsafe_allow_html=True)
         st.markdown(f'<div style="text-align: left;">Nearest MRT Station(s):</div>', unsafe_allow_html=True)
-        st.markdown(f'<div style="text-align: left;">Nearest MRT Station(s):</div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="text-align: left;">Award:</div>', unsafe_allow_html=True)
         st.markdown(f'<div style="text-align: left;">No. of Carpark Lots:</div>', unsafe_allow_html=True)
     with col2:
         # display values for building information
         st.markdown(f'<div style="text-align: right;">{basic_data.net_area} sq ft</div>', unsafe_allow_html=True)
         st.markdown(f'<div style="text-align: right;">{basic_data.floor}</div>', unsafe_allow_html=True)
-        st.markdown(f'<div style="text-align: right;">{basic_data.net_area}</div>', unsafe_allow_html=True)
-        st.markdown(f'<div style="text-align: right;">{basic_data.net_area}</div>', unsafe_allow_html=True)
-        st.markdown(f'<div style="text-align: right;">{basic_data.net_area}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="text-align: right;">{basic_data.MRT}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="text-align: right;">{basic_data.award}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="text-align: right;">{basic_data.carpark}</div>', unsafe_allow_html=True)
 
 
 # this is the main body content
